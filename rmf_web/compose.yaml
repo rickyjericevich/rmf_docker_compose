@@ -17,10 +17,11 @@ services:
       - "$TRAJECTORY_VISUALIZER_PORT:8006"
 
   rmf_web_api_server:
-    # image: $IMAGE_STORE/rmf_web_dashboard_and_server # RMF's original image for the api server is rmf-web-rmf-server
+    image: $IMAGE_STORE/rmf-web-rmf-server
     build:
-      context: .
+      context: ./api_server
       args:
+        IMAGE_STORE: $IMAGE_STORE
         DB_TYPE: $DB_TYPE
       tags:
         - rmf-web-rmf-server
@@ -36,12 +37,12 @@ services:
       - rmf_api_server_config.py
 
   rmf_web_dashboard:
-    # image: $IMAGE_STORE/rmf_web_dashboard_and_server # RMF's original image for the dashboard is rmf-web-dashboard
+    image: $IMAGE_STORE/rmf-web-dashboard
     build:
-      context: .
-      # additional_contexts:
-      #   - .
+      context: ./dashboard
       args:
+        IMAGE_STORE: $IMAGE_STORE
+        DOMAIN_URL: $DOMAIN_URL
         REACT_APP_TRAJECTORY_SERVER: $REACT_APP_TRAJECTORY_SERVER
         REACT_APP_RMF_SERVER: $REACT_APP_RMF_SERVER
         REACT_APP_AUTH_PROVIDER: $REACT_APP_AUTH_PROVIDER
