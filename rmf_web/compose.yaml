@@ -24,7 +24,7 @@ services:
         IMAGE_STORE: $IMAGE_STORE
         DB_TYPE: $DB_TYPE
       tags:
-        - rmf-web-rmf-server
+        - local/rmf-web-rmf-server
     environment:
       - RMF_SERVER_USE_SIM_TIME=$RMF_USE_SIM_TIME
       - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
@@ -48,7 +48,7 @@ services:
         REACT_APP_AUTH_PROVIDER: $REACT_APP_AUTH_PROVIDER
         REACT_APP_KEYCLOAK_CONFIG: $REACT_APP_KEYCLOAK_CONFIG
       tags:
-        - rmf-web-dashboard
+        - local/rmf-web-dashboard
     command: ["/bin/bash", "-c", "/ros_entrypoint.sh python3 -m http.server 80 -d /rmf_ws/src/dashboard"]
     ports:
       - "$REACT_APP_PORT:80"
