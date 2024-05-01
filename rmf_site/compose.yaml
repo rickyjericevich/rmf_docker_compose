@@ -1,0 +1,20 @@
+include:
+  - ../rmf_core/compose.yaml
+
+services:
+
+  rmf_building_map_server:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+      - RMF_BUILDING_MAP_SERVER_CONFIG_PATH=/rmf_building_map/$BUILDING_YAML_FILE_NAME
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 run rmf_building_map_tools building_map_server $$RMF_BUILDING_MAP_SERVER_CONFIG_PATH"]
+    depends_on:
+      - rmf_traffic_schedule
+    volumes:
+      - $BUILDING_YAML_FOLDER_PATH:/rmf_building_map
+
+    # fleet, lift & door adapters go here

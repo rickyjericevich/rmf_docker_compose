@@ -1,0 +1,50 @@
+# NOTE: use $$ to escape $ in docker-compose.yaml
+services:
+
+  rmf_traffic_schedule:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 run rmf_traffic_ros2 rmf_traffic_schedule --ros-args -p use_sim_time:=$$RMF_USE_SIM_TIME"]
+
+  rmf_task_dispatcher:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+      - RMF_BIDDING_TIME_WINDOW=$RMF_BIDDING_TIME_WINDOW
+      - RMF_SERVER_URI=$RMF_SERVER_URI
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 run rmf_task_ros2 rmf_task_dispatcher --ros-args -p use_sim_time:=$$RMF_USE_SIM_TIME -p bidding_time_window:=$$RMF_BIDDING_TIME_WINDOW -p server_uri:=$$RMF_SERVER_URI"]
+
+  rmf_door_supervisor:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 run rmf_fleet_adapter door_supervisor"]
+
+  rmf_lift_supervisor:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 run rmf_fleet_adapter lift_supervisor"]
+
+  rmf_traffic_blockade:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 run rmf_traffic_ros2 rmf_traffic_blockade --ros-args -p use_sim_time:=$$RMF_USE_SIM_TIME"]
+

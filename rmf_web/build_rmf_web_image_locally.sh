@@ -1,0 +1,1 @@
+docker build -t local/rmf_web_dashboard_and_server .

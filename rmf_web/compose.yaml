@@ -1,0 +1,55 @@
+include:
+  - ../rmf_site/compose.yaml
+
+configs:
+  rmf_api_server_config.py:
+    file: $RMF_API_SERVER_CONFIG_FOLDER_PATH/$RMF_API_SERVER_CONFIG_FILE_NAME
+
+services:
+
+  rmf_trajectory_visualizer:
+    image: $IMAGE_STORE/rmf
+    build: ../rmf_core
+    environment:
+      - RMF_TRAJECTORY_VISUALIZER_LEVEL_NAME=$TRAJECTORY_VISUALIZER_INITIAL_LEVEL_NAME
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh ros2 launch rmf_visualization visualization.launch.xml headless:=1 use_sim_time:=$$RMF_USE_SIM_TIME map_name:=$$RMF_TRAJECTORY_VISUALIZER_LEVEL_NAME"]
+    ports:
+      - "$TRAJECTORY_VISUALIZER_PORT:8006"
+
+  rmf_web_api_server:
+    # image: $IMAGE_STORE/rmf_web_dashboard_and_server # RMF's original image for the api server is rmf-web-rmf-server
+    build:
+      context: .
+      args:
+        DB_TYPE: $DB_TYPE
+      tags:
+        - rmf-web-rmf-server
+    environment:
+      - RMF_SERVER_USE_SIM_TIME=$RMF_USE_SIM_TIME
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION
+      - RMF_API_SERVER_CONFIG=/rmf_api_server_config.py
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh rmf_api_server"]
+    ports:
+      - "$RMF_API_SERVER_PORT:8000"
+    configs:
+      - rmf_api_server_config.py
+
+  rmf_web_dashboard:
+    # image: $IMAGE_STORE/rmf_web_dashboard_and_server # RMF's original image for the dashboard is rmf-web-dashboard
+    build:
+      context: .
+      # additional_contexts:
+      #   - .
+      args:
+        REACT_APP_TRAJECTORY_SERVER: $REACT_APP_TRAJECTORY_SERVER
+        REACT_APP_RMF_SERVER: $REACT_APP_RMF_SERVER
+        REACT_APP_AUTH_PROVIDER: $REACT_APP_AUTH_PROVIDER
+        REACT_APP_KEYCLOAK_CONFIG: $REACT_APP_KEYCLOAK_CONFIG
+      tags:
+        - rmf-web-dashboard
+      # ssh: # Uncomment this if you need to use ssh keys to clone private repositories
+      #   - myproject=~/.ssh/myproject.pem
+    command: ["/bin/bash", "-c", "/ros_entrypoint.sh python3 -m http.server 80 -d /rmf_ws/src/dashboard"]
+    ports:
+      - "$REACT_APP_PORT:80"
